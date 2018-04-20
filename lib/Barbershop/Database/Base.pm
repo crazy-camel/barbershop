@@ -8,7 +8,7 @@ sub query
 	my ($self, $stmt, @bind) = @_;
 
 	my $sth = $_[0]->db->prepare($stmt);
-	
+
 	$sth->execute(@bind);
 
 	my $results = $sth->fetchall_arrayref;

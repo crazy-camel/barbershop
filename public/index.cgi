@@ -13,7 +13,7 @@ use lib path($0)->absolute->parent(2)->child('lib')->stringify;
 
 use Barbershop::Application;
 
-my $app = Barbershop::Application->new( basedir => path($0)->parent(2) );
+my $app = Barbershop::Application->new( basedir => path($0)->parent(2)->stringify );
 
 while ( my $q = CGI::Fast->new() )
 {	
