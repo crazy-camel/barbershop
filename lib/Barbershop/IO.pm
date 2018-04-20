@@ -7,32 +7,36 @@ sub _new_instance
 {
         my $class = shift;
         my $self  = bless { }, $class;
-        
+
         $self->{'base'} = path( shift );
 
         return $self;
 }
 
-sub parse
+sub inspect
 {
-	return $_[0]->child( $_[1] )->stringify;
+	my( $self, @paths )= @_;
+	return $self->{'base'}->child( @paths )->stringify;
 }
 
 sub exists
 {
-	return $_[0]->child( $_[1] )->exists;
+	my( $self, @paths )= @_;
+	return $self->{'base'}->child( @paths )->exists;
 }
 
 sub touch
 {	
-	$_[0]->child( $_[1] )->touchpath->stringify;
+	my( $self, @paths )= @_;
+	$self->{'base'}->child( @paths )->touchpath->stringify;
 }
 
 sub slurp
 {
+	my( $self, @paths )= @_;
 	return ( wantarray )
-		? $_[0]->child( $_[1] )->lines_utf8
-		: $_[0]->child( $_[1] )->slurp_utf8;
+		? $self->{'base'}->child( @paths )->lines_utf8
+		: $self->{'base'}->child( @paths )->slurp_utf8;
 }
 
 

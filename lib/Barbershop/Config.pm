@@ -1,39 +1,28 @@
 package Barbershop::Config;
 
 use base 'Class::Singleton';
-use Path::Tiny qw/path/; 
+
+use Config::Tiny;
+use Hash::Flatten qw/flatten/;
+use Barbershop::IO;
 
 sub _new_instance
 {
-        my $class = shift;
-        my $self  = bless { }, $class;
-        
-        $self->{'base'} = path( shift );
+    my $class = shift;
+    my $self  = bless { }, $class;
+    
+    my ( $config, $cfg) = ( Config::Tiny->read( Barbershop::IO->instance()->inspect('config','app.ini') ), {} );
+  	
+    $cfg->{$_} = $config->{$_} for ( keys %$config );
+    
+    $self->{'config'} = flatten( $cfg );
 
-        return $self;
+    return $self;
 }
 
-sub parse
+sub get
 {
-	return $_[0]->sibling( $_[1] )->stringify;
+	return $_[0]->{'config'}->{ $_[1] };
 }
-
-sub exists
-{
-	return $_[0]->sibling( $_[1] )->exists;
-}
-
-sub touch
-{	
-	$_[0]->sibling( $_[1] )->touchpath->stringify;
-}
-
-sub slurp
-{
-	return ( wantarray )
-		? $_[0]->sibling( $_[1] )->lines_utf8
-		: $_[0]->sibling( $_[1] )->slurp_utf8;
-}
-
 
 1;
