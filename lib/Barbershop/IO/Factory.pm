@@ -1,4 +1,4 @@
-package Barbershop::IO;
+package Barbershop::IO::Factory;
 
 use base 'Class::Singleton';
 use Path::Tiny qw/path/; 

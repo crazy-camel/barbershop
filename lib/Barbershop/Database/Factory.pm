@@ -1,21 +1,20 @@
 ########################################
 # A persitant database manager
 ########################################
-package Barbershop::Database;
+package Barbershop::Database::Factory;
 
 use base 'Class::Singleton';
-
-use Barbershop::IO;
-use Barbershop::Config;
 use DBI;
 
+use Barbershop::IO::Factory;
+use Barbershop::Config::Factory;
 
 sub _new_instance
 {
         my $class = shift;
         my $self  = bless { }, $class;
 
-        my ( $config, $io ) = ( Barbershop::Config->instance(), Barbershop::IO->instance() );
+        my ( $config, $io ) = ( Barbershop::Config::Factory->instance(), Barbershop::IO::Factory->instance() );
         # SQLITE
         if ( $config->get('database.type') eq 'sqlite' )
         {
