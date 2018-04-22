@@ -6,14 +6,7 @@ use Barbershop::IO::Factory;
 use Barbershop::Config::Factory;
 use DateTime;
 
-sub _new_instance
-{
-        my $self  = bless { }, shift;
-        
-        $self->{'timezone'} = Barbershop::Config::Factory->instance()->get("general.timezone", "America/New_York");
 
-        return $self;
-}
 
 
 sub carp

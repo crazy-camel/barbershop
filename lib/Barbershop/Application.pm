@@ -30,7 +30,6 @@ sub respond
 
 	my ($headers, $body) = Barbershop::View::Factory->instance()->process( $query );
 	
-
 	$response .= "ok";
 	
 	return $response;
