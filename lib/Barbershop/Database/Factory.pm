@@ -24,9 +24,10 @@ sub _new_instance
         			: $io->touch( $config->get('database.path') );
 
         	$self->{'db'} = DBI->connect("dbi:SQLite:dbname=".$path,"","");
+
         	return $self;
         }
-
+        
         return $self;
 }
 
