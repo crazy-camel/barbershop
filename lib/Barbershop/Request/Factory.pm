@@ -1,4 +1,4 @@
-package Barbershop::View::Factory;
+package Barbershop::Request::Factory;
 
 use base 'Class::Singleton';
 
@@ -39,35 +39,29 @@ sub process
 sub parseurl
 {
 	my ( $io, @paths, %params ) = ( Barbershop::IO::Factory->instance(), (), () );
-	my @params = split '/', $QUERY_STRING;
+	my @segments = split '/', $QUERY_STRING;
 
-	if ( scalar (@params) == 0 )
+	if ( scalar (@segments) == 0 )
 	{
-		return (
-			Barbershop::IO::Factory->instance()->inspect( "resources","views","welcome.mustache" ),
-			{}
-			)
+		return Barbershop::IO::Factory->instance()->inspect( "app","welcome" );
 	}
 
-	while ( my ($path) = splice(@params, 0, 1) )
+	while ( my $path = shift @segments )
 	{
-		break unless ( scalar( @paths ) < 1 && $io->exists( "resources", "views", $path ) ) or $io->exists( "resources", "views", @paths );
+		break if ( not $io->is_dir( "app", @paths, $path ) )
 		push @paths, $path;
 	}
 
-	if ( scalar( @params )  )
+	my $parameters = scalar( @segments );
+	
+	if ( $parameters )
 	{
-		push @params, 1 if ( scalar(@params) % 2 != 0 );
-		%params = @params;
-	}
-
-	if ( scalar (@paths) == 0 )
-	{
-		return 
+		push @params, 1 if (  $parameters % 2 != 0 );
+		%params = @segments ;
 	}
 
 	return ( 
-		Barbershop::IO::Factory->instance()->inspect( "resources", "views", @paths ),
+		( scalar (@paths) == 0  ) ? Barbershop::IO::Factory->instance()->inspect( "app", "welcome" ) : Barbershop::IO::Factory->instance()->inspect( "app", @paths ),
 		\%params
 		);
 

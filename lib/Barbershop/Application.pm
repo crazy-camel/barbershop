@@ -6,7 +6,7 @@ use CGI::Carp qw/fatalsToBrowser/;
 use Barbershop::Config::Factory;
 use Barbershop::IO::Factory;
 use Barbershop::Database::Factory;
-use Barbershop::View::Factory;
+use Barbershop::Request::Factory;
 use Barbershop::Logger::Factory;
 
 sub _new_instance
@@ -15,24 +15,19 @@ sub _new_instance
 	my ( $class, $base ) = @_;
     my $self  = bless { }, $class;
 
-    $_->instance( $base ) for ('Barbershop::IO::Factory','Barbershop::Config::Factory', 'Barbershop::Database::Factory', 'Barbershop::Logger::Factory', 'Barbershop::View::Factory');
+    $_->instance( $base ) for ('Barbershop::IO::Factory','Barbershop::Config::Factory', 'Barbershop::Database::Factory', 'Barbershop::Logger::Factory', 'Barbershop::Request::Factory');
 
-    return $self;
+    return $self; 
 }
 
 sub respond
 {
 	my ($self, $query ) = @_;
 
-	my $response = $query->header;
-
-	print $response;
-
-	my ($headers, $body) = Barbershop::View::Factory->instance()->process( $query );
+	my ($headers, $body) = Barbershop::Request::Factory->instance()->process( $query );
 	
-	$response .= "ok";
-	
-	return $response;
+	return  join( "", ( $headers, $body ) );
+
 }
 
 1;
