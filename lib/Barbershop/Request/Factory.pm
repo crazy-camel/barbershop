@@ -13,15 +13,24 @@ sub process
 	my ($self, $query) = @_;
 	my ( $path, $params ) = $self->parseurl();
 
-	if ( $path eq '404' )
+	if ( $path eq '404' or not $path->exists( "view.html" ) )
 	{
 		return _404( $params );
 	}
+
+	# initialize a new request of each
+	my ( $model, $controller, $view ) = ( undef, undef, undef ); 
 	
-	say $path;
+	foreach my $portion ( "model", "controller", "view" )
+	{
+		if ( $path->exists( "model.yml" ) && $portion eq "model" );
+		if ( $path->exists( "model.yml" ) && $portion eq "model" );
+	}
+
+	# three stage process of getting the response together
 	my $template = Template::Mustache->new(
 		template_path =>  $path,
-		partials_path => Barbershop::IO::Factory->instance()->inspect( "resources", "views", "partials" )
+		partials_path => Barbershop::IO::Factory->instance()->inspect( "app", "partials" )
 	);
 
 	#use Data::Dump qw/dump/;
@@ -43,7 +52,7 @@ sub parseurl
 
 	if ( scalar (@segments) == 0 )
 	{
-		return Barbershop::IO::Factory->instance()->inspect( "app","welcome" );
+		return Barbershop::IO::Factory->instance()->base( "app","welcome" );
 	}
 
 	while ( my $path = shift @segments )
@@ -61,7 +70,7 @@ sub parseurl
 	}
 
 	return ( 
-		( scalar (@paths) == 0  ) ? Barbershop::IO::Factory->instance()->inspect( "app", "welcome" ) : Barbershop::IO::Factory->instance()->inspect( "app", @paths ),
+		( scalar (@paths) == 0  ) ? Barbershop::IO::Factory->instance()->base( "app", "welcome" ) : Barbershop::IO::Factory->instance()->base( "app", @paths ),
 		\%params
 		);
 

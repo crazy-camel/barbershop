@@ -19,6 +19,12 @@ sub inspect
 	my( $self, @paths )= @_;
 	return $self->{'base'}->child( @paths )->stringify;
 }
+ß
+sub base
+{
+	my( $self, @paths )= @_;
+	return $self->{'base'}->child( @paths )->stringify;
+}
 
 sub exists
 {
