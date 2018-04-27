@@ -1,7 +1,4 @@
-ErrorDocument 404 /404.html
 ErrorDocument 500 /500.html
-ErrorDocument 403 /403.html
-
 DirectoryIndex index.cgi index.html
 
 RewriteEngine on

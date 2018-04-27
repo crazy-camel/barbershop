@@ -11,19 +11,25 @@ sub _new_instance
         $self->{'base'} = path( shift );
 
         return $self;
-
 }
+
+sub is_dir
+{
+	my( $self, @paths )= @_;
+	return $self->{'base'}->child( @paths )->is_dir();
+}
+
 
 sub inspect
 {
 	my( $self, @paths )= @_;
 	return $self->{'base'}->child( @paths )->stringify;
 }
-ß
+
 sub base
 {
 	my( $self, @paths )= @_;
-	return $self->{'base'}->child( @paths )->stringify;
+	return $self->{'base'}->child( @paths );	
 }
 
 sub exists

@@ -2,7 +2,8 @@ package Barbershop::Application;
 
 use base 'Class::Singleton';
 
-use CGI::Carp qw/fatalsToBrowser/;
+use CGI::Carp qw/fatalsToBrowser warningsToBrowser/;
+
 use Barbershop::Config::Factory;
 use Barbershop::IO::Factory;
 use Barbershop::Database::Factory;
@@ -25,9 +26,17 @@ sub respond
 	my ($self, $query ) = @_;
 
 	my ($headers, $body) = Barbershop::Request::Factory->instance()->process( $query );
-	
-	return  join( "", ( $headers, $body ) );
 
+	my $response; 
+
+	foreach my $header ( @$headers )
+	{	
+		$response .= $query->header( $header->{'key'}, $header->{'value'} );
+	}
+
+	$response .= $body	;
+
+	return $response;
 }
 
 1;
