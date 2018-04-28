@@ -17,6 +17,6 @@ my $base = path($0)->parent(2)->stringify;
 my $app = Barbershop::Application->instance( $base );
 
 while ( my $q = CGI::Fast->new() )
-{	
+{
 	print $app->respond( $q );
 }

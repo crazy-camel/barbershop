@@ -34,7 +34,7 @@ sub respond
 		$response .= $query->header( $header->{'key'}, $header->{'value'} );
 	}
 
-	$response .= $body	;
+	$response .= $body;
 
 	return $response;
 }

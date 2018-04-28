@@ -7,7 +7,6 @@ use warnings qw/all/;
 use Path::Tiny qw/path/;
 use Module::Load;
 
-
 use lib 'lib';
 
 use Barbershop::Config::Factory;
@@ -15,26 +14,28 @@ use Barbershop::IO::Factory;
 use Barbershop::Database::Factory;
 use Barbershop::Logger::Factory;
 
-use Barbershop::Console::Commands::Log::Clear;
-use Barbershop::Console::Commands::Make::Path;
+use Barbershop::Console::Command;
 
 
 my $base = path( '.' )->absolute->stringify;
 
 $_->instance( $base ) for ('Barbershop::IO::Factory','Barbershop::Config::Factory', 'Barbershop::Database::Factory', 'Barbershop::Logger::Factory');
 
+my $commands = Barbershop::Console::Command->new();
+
+my @options = $commands->plugins();
 my $addressed;
-foreach my $available ("Log::Clear", "Make::Path")
+
+foreach my $module (@options)
 {
-	my $module = "Barbershop::Console::Commands::".$available;
 	if ( $module->can( $ARGV[0] ) )
-	{
+	{	
 		$module->handle( $ARGV[1] );
 		$addressed = 1;
 	}
 }
 
-if ( !defined $addressed )
-{
-	print "[HELP SCREEN]"
-}
+#if ( !defined $addressed )
+#{
+#	print "[HELP SCREEN]"
+#}

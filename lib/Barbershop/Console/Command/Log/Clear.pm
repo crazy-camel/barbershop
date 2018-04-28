@@ -1,8 +1,6 @@
-package Barbershop::Console::Commands::Log::Clear;
-
-
+package Barbershop::Console::Command::Log::Clear;
 use Barbershop::Logger::Factory;
-use feature qw/say/;
+
 
 sub can
 {
@@ -12,7 +10,7 @@ sub can
 sub handle
 {
 	Barbershop::Logger::Factory->instance()->clear();
-	say "[log.clear] log has been cleared";
+	print "[log.clear] log has been cleared\n";
 }
 
 

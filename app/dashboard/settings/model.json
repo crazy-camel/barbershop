@@ -1,0 +1,5 @@
+{
+	"auth":{ "type": "session", "login": "/login" },
+	"title":"Dashboard - settings",
+	"lang": "en"
+}

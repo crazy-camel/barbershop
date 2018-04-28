@@ -7,7 +7,7 @@ use Barbershop::IO::Factory;
 use Template::Mustache;
 use Env;
 use Module::Load;
-use YAML::Tiny;
+use JSON;
 
 
 sub _new_instance
@@ -28,7 +28,7 @@ sub process
 	
 	# three stage process of getting the response together
 	# Step 1 - Load the module
-	my $model = ( $path->child( "model.yml")->exists() ) ?  YAML::Tiny->read( $path->child( 'model.yml' )->stringify )->[0] : {} ;
+	my $model = ( $path->child( "model.json")->exists() ) ?  from_json( $path->child( 'model.json' )->slurp_utf8() ) : {} ;
 	
 	# Lets merge in the parameters if any
 	$model->{'query'}->{$_} = $params->{ $_ } for ( keys %$params );
