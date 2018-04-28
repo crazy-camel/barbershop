@@ -7,9 +7,7 @@ sub _new_instance
 {
         my $class = shift;
         my $self  = bless { }, $class;
-
         $self->{'base'} = path( shift );
-
         return $self;
 }
 
@@ -17,6 +15,14 @@ sub is_dir
 {
 	my( $self, @paths )= @_;
 	return $self->{'base'}->child( @paths )->is_dir();
+}
+
+sub template
+{
+	my( $self, $type, @path )= @_;
+	my $template = $self->{'base'}->child( "resources", "templates", $type )->stringify;
+	my $clone = $self->{'base'}->child( @path )->touchpath->stringify;
+	return path( $template )->copy( $clone );
 }
 
 

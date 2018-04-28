@@ -26,7 +26,10 @@ sub process
 	# lets default all headers with a utf-8 output
 	my @headers = ( { 'key' => 'charset', 'value' => 'utf-8' } );
 	
-	# three stage process of getting the response together
+	# Step 1 - Check for middleware (guards or request preprocessing)
+		
+
+	# multi stage process of getting the response together
 	# Step 1 - Load the module
 	my $model = ( $path->child( "model.json")->exists() ) ?  decode_json( $path->child( 'model.json' )->slurp_utf8() ) : {} ;
 	
@@ -63,12 +66,12 @@ sub parseurl
 
 	if ( scalar (@segments) == 0 )
 	{
-		return Barbershop::IO::Factory->instance()->base( "app","welcome" );
+		return Barbershop::IO::Factory->instance()->base( "app", "routes", "welcome" );
 	}
 
 	foreach my $path (@segments)
 	{
-		if ( $io->is_dir( "app", @paths, $path ) )
+		if ( $io->is_dir( "app", "routes", @paths, $path ) )
 		{
 			push @paths, $path;
 			next;
@@ -83,7 +86,7 @@ sub parseurl
 	}
 
 	return ( 
-		Barbershop::IO::Factory->instance()->base( "app", @paths ),
+		Barbershop::IO::Factory->instance()->base( "app", "routes", @paths ),
 		\%params
 		);
 

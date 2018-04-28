@@ -23,14 +23,14 @@ sub can
 sub handle
 {
 
-	if ( Barbershop::IO::Factory->instance()->exists( "app", $_[1], "view.html" ) )
+	if ( Barbershop::IO::Factory->instance()->exists( "app", "routes", $_[1], "view.html" ) )
 	{
 		print "[make.path] error - that path already exists ($_[1])\n";
 		return;
 	}
 
-	Barbershop::IO::Factory->instance()->touch( "app", $_[1], "view.html" )->spew_utf8( $template );
-	Barbershop::IO::Factory->instance()->touch( "app", $_[1], "model.json" )->spew_utf8( "{\"title\":\"". $_[0]->str_replace( "/", " - ", ucfirst( $_[1] ), 1 ) ."\", \"lang\": \"en\"}" );
+	Barbershop::IO::Factory->instance()->template( "view.html", "app", "routes", $_[1], "view.html" );
+	Barbershop::IO::Factory->instance()->touch( "app", "routes", $_[1], "model.json" )->spew_utf8( "{\"title\":\"". $_[0]->str_replace( "/", " - ", ucfirst( $_[1] ), 1 ) ."\", \"lang\": \"en\"}" );
 
 	print "[make.path] new path [".$_[1]."] has been created in the app folder\n";
 }
