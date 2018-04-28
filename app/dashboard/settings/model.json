@@ -1,5 +1,5 @@
 {
-	"auth":{ "type": "session", "login": "/login" },
+	"auth": { "type": "session", "login": "/login" },
 	"title":"Dashboard - settings",
 	"lang": "en"
 }

@@ -7,7 +7,7 @@ use Barbershop::IO::Factory;
 use Template::Mustache;
 use Env;
 use Module::Load;
-use JSON;
+use JSON::XS;
 
 
 sub _new_instance
@@ -28,7 +28,7 @@ sub process
 	
 	# three stage process of getting the response together
 	# Step 1 - Load the module
-	my $model = ( $path->child( "model.json")->exists() ) ?  from_json( $path->child( 'model.json' )->slurp_utf8() ) : {} ;
+	my $model = ( $path->child( "model.json")->exists() ) ?  decode_json( $path->child( 'model.json' )->slurp_utf8() ) : {} ;
 	
 	# Lets merge in the parameters if any
 	$model->{'query'}->{$_} = $params->{ $_ } for ( keys %$params );
@@ -39,9 +39,11 @@ sub process
 		load $path->child( "controller.pm" )->stringify;
 		$model = Controller->new( $model )->model;		
 	}
-	
+		
 	my $template = Template::Mustache->new(
-		template_path =>  $path->child("view.html")->stringify,
+		template_path =>  ( $path->child("view.html")->exists() ) 
+				? $path->child("view.html")->stringify
+				: Barbershop::IO::Factory->instance()->inspect( "public", "404.html" ),
 		partials_path => Barbershop::IO::Factory->instance()->inspect( "app", "partials" )
 	);
 
@@ -102,8 +104,7 @@ sub headers
 
 sub _404
 {
-	my $body = Barbershop::IO::Factory->instance()->slurp( "public", '404.html' );
-	return $body;
+	return Barbershop::IO::Factory->instance()->slurp( "public", '404.html' );
 }
 
 
