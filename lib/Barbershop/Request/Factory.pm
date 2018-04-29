@@ -5,7 +5,6 @@ use base 'Class::Singleton';
 use CGI::Carp;
 use Barbershop::IO::Factory;
 use Template::Mustache;
-use Env;
 use Module::Load;
 use JSON::XS;
 
@@ -21,17 +20,20 @@ sub _new_instance
 sub process
 {
 	my ( $self, $query ) = @_;
-	my ( $path, $params ) = $self->parseurl( $query );
+	my ( $path, $params, $middleware ) = $self->parseurl( $query );
 
 	# lets default all headers with a utf-8 output
 	my @headers = ( { 'key' => 'charset', 'value' => 'utf-8' } );
 	
 	# Step 1 - Check for middleware (guards or request preprocessing)
-		
+	if ( $middleware )
+	{
+		#
+	}
 
 	# multi stage process of getting the response together
 	# Step 1 - Load the module
-	my $model = ( $path->child( "model.json")->exists() ) ?  decode_json( $path->child( 'model.json' )->slurp_utf8() ) : {} ;
+	my $model = ( $path->child( "model.json" )->exists() ) ?  decode_json( $path->child( 'model.json' )->slurp_utf8() ) : {} ;
 	
 	# Lets merge in the parameters if any
 	$model->{'query'}->{$_} = $params->{ $_ } for ( keys %$params );
@@ -60,25 +62,35 @@ sub process
 # @returns - path or false (if not found)
 sub parseurl
 {
-	my ( $io, @paths, %params ) = ( Barbershop::IO::Factory->instance(), (), () );
-	my @segments = split '/', $QUERY_STRING;
-	my @parameters;
+	my ( $io, @segments ) = ( Barbershop::IO::Factory->instance(), split '/', $ENV{'QUERY_STRING'} );
+
 
 	if ( scalar (@segments) == 0 )
 	{
 		return Barbershop::IO::Factory->instance()->base( "app", "routes", "welcome" );
 	}
 
+	my ( @parameters, @paths, @middleware, %params ) = ( undef, undef, undef, undef );
+
+
 	foreach my $path (@segments)
 	{
 		if ( $io->is_dir( "app", "routes", @paths, $path ) )
 		{
 			push @paths, $path;
+
+			# lets check if there is a middleware
+			if ( $io->is_dir( "app", "routes", @paths, "middleware" ) )
+			{
+				push @middleware, ucfirst($_->basename) for ( $io->children( "app", "routes", @paths, "middleware" ) )
+			}
+
 			next;
 		}
 		push @parameters, $path;
 	}
 	
+
 	if ( @parameters )
 	{
 		push @parameters, 1 if (  scalar( @parameters ) % 2 != 0 );
@@ -87,7 +99,8 @@ sub parseurl
 
 	return ( 
 		Barbershop::IO::Factory->instance()->base( "app", "routes", @paths ),
-		\%params
+		\%params,
+		\@middleware
 		);
 
 }

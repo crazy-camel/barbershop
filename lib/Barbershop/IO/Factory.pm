@@ -26,6 +26,12 @@ sub template
 }
 
 
+sub children
+{
+	my( $self, @path )= @_;
+	$self->{'base'}->child( @paths )->children();
+}
+
 sub inspect
 {
 	my( $self, @paths )= @_;

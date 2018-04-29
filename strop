@@ -24,18 +24,22 @@ $_->instance( $base ) for ('Barbershop::IO::Factory','Barbershop::Config::Factor
 my $commands = Barbershop::Console::Command->new();
 
 my @options = $commands->plugins();
-my $addressed;
+
+my $helpscreen = "\n#################################\n"." Barbershop STROP command line\n"."#################################\n\n";
+my $helped = 0;
 
 foreach my $module (@options)
 {
 	if ( $module->can( $ARGV[0] ) )
 	{	
 		$module->handle( $ARGV[1] );
-		$addressed = 1;
+		$helped = 1;
 	}
+
+	$helpscreen .= $module->help()."\n";
 }
 
-#if ( !defined $addressed )
-#{
-#	print "[HELP SCREEN]"
-#}
+if ( $helped == 0 )
+{
+	print $helpscreen;
+}

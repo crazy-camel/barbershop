@@ -1,4 +1,5 @@
 package Barbershop::Console::Command::Log::Clear;
+
 use Barbershop::Logger::Factory;
 
 
@@ -16,7 +17,7 @@ sub handle
 
 sub help
 {
-	return "Help from Clear";
+	return "log:clear 		Clears the log file\n";
 }
 
 1;

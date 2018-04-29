@@ -1,23 +1,11 @@
-package Barbershop::Console::Command::Make::Path;
+package Barbershop::Console::Command::Make::Route;
 
 use Barbershop::IO::Factory;
-
-my $template = "<!DOCTYPE html>
-<html lang=\"{{ lang }}\">
-<head>
-	<meta charset=\"UTF-8\">
-	<title>{{ title }}</title>
-</head>
-<body>
-	<h1>{{ title }}</h1>
-	<p>Make something great!</p>
-</body>
-</html>";
 
 
 sub can
 {
-	return ( $_[1] eq "make:path" ) ? 1 : 0;
+	return ( $_[1] eq "make:route" ) ? 1 : 0;
 }
 
 sub handle
@@ -32,7 +20,7 @@ sub handle
 	Barbershop::IO::Factory->instance()->template( "view.html", "app", "routes", $_[1], "view.html" );
 	Barbershop::IO::Factory->instance()->touch( "app", "routes", $_[1], "model.json" )->spew_utf8( "{\"title\":\"". $_[0]->str_replace( "/", " - ", ucfirst( $_[1] ), 1 ) ."\", \"lang\": \"en\"}" );
 
-	print "[make.path] new path [".$_[1]."] has been created in the app folder\n";
+	print "[make.path] new route [".$_[1]."] has been created in the app folder\n";
 }
 
 sub str_replace {
@@ -53,7 +41,7 @@ sub str_replace {
 
 sub help
 {
-	return "Help for Making paths";
+	return "make::route 		Create a route for your web application";
 };
 
 
