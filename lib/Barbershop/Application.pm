@@ -27,15 +27,10 @@ sub respond
 
 	my ($headers, $body) = Barbershop::Request::Factory->instance()->process( $query );
 
-	my $response; 
-
-	foreach my $header ( @$headers )
-	{	
-		$response .= $query->header( $header->{'key'}, $header->{'value'} );
-	}
+	my $response = ( ref $headers eq 'CGI::Header::Redirect' ) ? $headers->as_string() : $query->header( $headers->header );
 
 	$response .= $body;
-
+	
 	return $response;
 }
 

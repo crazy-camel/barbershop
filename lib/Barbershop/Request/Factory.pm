@@ -6,6 +6,7 @@ use CGI::Carp;
 use Barbershop::IO::Factory;
 use Template::Mustache;
 use Module::Load;
+use CGI::Header;
 use JSON::XS;
 
 
@@ -16,19 +17,19 @@ sub _new_instance
     return $self;
 }
 
-
 sub process
 {
 	my ( $self, $query ) = @_;
 	my ( $path, $params, $middleware ) = $self->parseurl( $query );
 
 	# lets default all headers with a utf-8 output
-	my @headers = ( { 'key' => 'charset', 'value' => 'utf-8' } );
+	my $header = CGI::Header->new( { charset => 'utf-8'}, $query );
 	
 	# Step 1 - Check for middleware (guards or request preprocessing)
 	if ( $middleware )
 	{
-		#
+		my @inspection = $self->middleware( $middleware, $header );
+		return @inspection if ( scalar @inspection );	
 	}
 
 	# multi stage process of getting the response together
@@ -54,7 +55,7 @@ sub process
 
 	my $view = $template->render( $model );
 
-	return ( \@headers, $view );
+	return ( $header, $view );
 }
 
 # inspect - inspects the URL and translate to view path
@@ -62,8 +63,12 @@ sub process
 # @returns - path or false (if not found)
 sub parseurl
 {
-	my ( $io, @segments ) = ( Barbershop::IO::Factory->instance(), split '/', $ENV{'QUERY_STRING'} );
 
+	#use Data::Dump qw/dump/;
+	#use CGI;
+	#print CGI->new()->header;
+
+	my ( $io, @segments ) = ( Barbershop::IO::Factory->instance(), split '/', $ENV{'QUERY_STRING'} );
 
 	if ( scalar (@segments) == 0 )
 	{
@@ -82,14 +87,12 @@ sub parseurl
 			# lets check if there is a middleware
 			if ( $io->is_dir( "app", "routes", @paths, "middleware" ) )
 			{
-				push @middleware, ucfirst($_->basename) for ( $io->children( "app", "routes", @paths, "middleware" ) )
+				push @middleware, ucfirst( $_->basename ) for ( $io->children( "app", "routes", @paths, "middleware" ) )
 			}
-
 			next;
 		}
 		push @parameters, $path;
 	}
-	
 
 	if ( @parameters )
 	{
@@ -105,22 +108,28 @@ sub parseurl
 
 }
 
-sub headers
-{
-	my ( $self, $args ) = @_;
-	
-	my @headers =  (
-        { 'key' => 'charset', 'value' => 'utf-8' }
-    );
-
-    push @headers, { 'key' => $_ , 'value' => $args->{$_} } for keys %{ $args };
-
-    return @headers;
-}
 
 sub _404
 {
 	return Barbershop::IO::Factory->instance()->slurp( "public", '404.html' );
+}
+
+sub middleware
+{
+	my ( $self, $middleware, $header ) = @_;
+
+	foreach my $mids (  @$middleware )
+	{
+		load Barbershop::IO::Factory->instance()->inspect("app", "middleware", ucfirst( $mids ), "Handler.pm");
+		
+		my $handler = $mids."::Handler";
+
+		$header = $handler->new()->handle( $header );
+			
+		return ( $header, "" ) if ( ref $header  eq 'CGI::Header::Redirect' );
+	}
+
+	return ();
 }
 
 

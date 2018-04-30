@@ -29,7 +29,7 @@ sub template
 sub children
 {
 	my( $self, @path )= @_;
-	$self->{'base'}->child( @paths )->children();
+	return $self->{'base'}->child( @path )->children();
 }
 
 sub inspect
